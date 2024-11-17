@@ -4,6 +4,38 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 
+function serveStaticFile(res, filePath, contentType, responseCode = 200) {
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('500 - Internal Server Error');
+        } else {
+            res.writeHead(responseCode, { 'Content-Type': contentType });
+            res.end(data);
+        }
+    });
+}
+
+const server = http.createServer((req, res) => {
+    let filePath = '';
+
+    // Serve index.html
+    if (req.url === '/' || req.url === '/index.html') {
+        filePath = path.join(__dirname, 'public', 'index.html');
+        serveStaticFile(res, filePath, 'text/html');
+    }
+    // Serve scripts.js
+    else if (req.url === '/scripts.js') {
+        filePath = path.join(__dirname, 'public', 'scripts.js');
+        serveStaticFile(res, filePath, 'application/javascript');
+    }
+    // Serve 404 for any other route
+    else {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 - File Not Found');
+    }
+});
+/*
 const server = http.createServer((req, res) => {
     // Set the response header (status code and content type)
     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -14,7 +46,7 @@ const server = http.createServer((req, res) => {
     // End the response
     res.end();
 });
-
+*/
 // Server listens on port 3000
 const PORT = 3000;
 server.listen(PORT, () => {
@@ -23,7 +55,7 @@ server.listen(PORT, () => {
 
 
 console.log('Current directory name' + '' + __dirname);
-var directoryName = __dirname;
+//var directoryName = __dirname;
 
 let filename = 'finances.xlsx';
 console.log('File name', filename);

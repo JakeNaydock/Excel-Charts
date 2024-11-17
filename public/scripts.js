@@ -1,3 +1,6 @@
+// Require Chart.js
+const Chart = require('chart.js/auto');
+
 document.addEventListener('DOMContentLoaded', function () {
     // Get the context of the canvas element we want to render the chart in
     const ctx = document.getElementById('myChart').getContext('2d');

@@ -66,74 +66,65 @@ server.listen(PORT, () => {
 });
 
 
+getChartData();
+
+function getChartData() {
+    console.log('Current directory name' + '' + __dirname);
+    //var directoryName = __dirname;
+
+    let filename = 'finances.xlsx';
+    console.log('File name', filename);
+
+
+    const workbook = xlsx.readFile(filename);
+    //console.log('Workbook object: \n', workbook);
+    //const workSheetsFromFile = xlsx.parse(`${directoryName}/myFile.xlsx`);
+    //console.log('Worksheet from file', workSheetsFromFile);
+    const sheetNameList = workbook.SheetNames;
+    //console.log('Sheet name list: ' + '\n', sheetNameList);
+
+    const arrSheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]]);
+    console.log(arrSheetData);
+    let firstRow = arrSheetData[0];
+
+    console.log('First row data \n', firstRow);
+    let foodTotal = 0;
+    let gasTotal = 0;
+    let billTotal = 0;
 
 
 
+    for (let i = 0; i < arrSheetData.length; i++) {
 
-
-
-
-/*
-const server = http.createServer((req, res) => {
-    let filePath = '';
-
-    // Serve index.html
-    if (req.url === '/' || req.url === '/index.html') {
-        filePath = path.join(__dirname, 'public', 'index.html');
-        try {
-            serveStaticFile(res, filePath, 'text/html');
-        } catch (error) {
-            console.log('Caught error serving static file: ', error);
+        let expense = arrSheetData[i].Expense;
+        let amount = arrSheetData[i].Amount;
+        //console.log(`Date as integer on line ${i}: ${intDate}`);
+        if (expense === 'Food') {
+            foodTotal += amount;
+        } else if (expense === 'Gas') {
+            gasTotal += amount;
+        } else if (expense.includes('Bill')) {
+            billTotal += amount;
         }
 
+        let intDate = arrSheetData[i].Date;
+        let date = convertExcelDate(intDate);
+        //console.log(`Date converted on line ${i}: ${date}`);
     }
 
+    let chartData = {
+        foodTotal,
+        gasTotal,
+        billTotal
+    };
 
-    // Serve scripts.js
-    else if (req.url === '/scripts.js') {
-        filePath = path.join(__dirname, 'public', 'scripts.js');
-        console.log('Req url is script.js, file path: ', filePath);
-        serveStaticFile(res, filePath, 'application/javascript');
-    }
-    // Serve 404 for any other route
-    else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end('404 - File Not Found');
-    }
-});
+    console.log('Chart data: ', chartData);
 
-
-
-BEGIN EXCEL LOGIC BELOW:
-
-console.log('Current directory name' + '' + __dirname);
-//var directoryName = __dirname;
-
-let filename = 'finances.xlsx';
-console.log('File name', filename);
-
-
-const workbook = xlsx.readFile(filename);
-console.log('Workbook object: \n', workbook);
-//const workSheetsFromFile = xlsx.parse(`${directoryName}/myFile.xlsx`);
-//console.log('Worksheet from file', workSheetsFromFile);
-const sheetNameList = workbook.SheetNames;
-console.log('Sheet name list: ' + '\n', sheetNameList);
-
-const arrSheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]]);
-console.log(arrSheetData);
-let firstRow = arrSheetData[0];
-
-console.log('First row data \n', firstRow);
-
-for (let i = 0; i < arrSheetData.length; i++) {
-    let intDate = arrSheetData[i].Date;
-    console.log(`Date as integer on line ${i}: ${intDate}`);
-
-    let date = convertExcelDate(intDate);
-    console.log(`Date converted on line ${i}: ${date}`);
-
+    return chartData;
 }
+
+
+
 
 function convertExcelDate(excelSerialDate) {
     // Excel starts from January 1, 1900, which corresponds to serial date 1.
@@ -148,12 +139,3 @@ function convertExcelDate(excelSerialDate) {
 }
 
 
-
-/*
-filenames.forEach((file) => {
-    const _file = path.resolve(directoryName, file);
-    console.log(_file);
-
-    //var workbook = xlsx.readFile(_file);
-});
-*/

@@ -3,6 +3,20 @@ const fs = require('fs');
 //const jsontoxml = require("jsontoxml");
 const path = require('path');
 const http = require('http');
+const { log } = require('console');
+const { LogarithmicScale } = require('chart.js');
+
+
+// Handle routes and API logic
+function handleRoutes(req, res) {
+    if (req.url === '/api/data') {
+        // Example API response
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Hello from the server!' }));
+        return true;
+    }
+    return false;
+}
 
 function serveStaticFile(res, filePath, contentType, responseCode = 200) {
     fs.readFile(filePath, (err, data) => {
@@ -16,17 +30,69 @@ function serveStaticFile(res, filePath, contentType, responseCode = 200) {
     });
 }
 
+// Create the server
+const server = http.createServer((req, res) => {
+    // Handle API or dynamic routes
+    if (handleRoutes(req, res)) return;
+
+    // Serve static files
+    const filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+    const extname = path.extname(filePath);
+    let contentType = 'text/html';
+    switch (extname) {
+        case '.js': contentType = 'text/javascript'; break;
+        case '.css': contentType = 'text/css'; break;
+        case '.json': contentType = 'application/json'; break;
+        case '.png': contentType = 'image/png'; break;
+        case '.jpg': contentType = 'image/jpeg'; break;
+        case '.ico': contentType = 'image/x-icon'; break;
+    }
+
+    fs.stat(filePath, (err, stats) => {
+        console.log('Requested filepath', filePath);
+        if (!err && stats.isFile()) {
+            serveStaticFile(res, filePath, contentType);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('404: File Not Found');
+        }
+    });
+});
+
+// Server listens on port 3000
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
+
+
+
+
+
+
+
+
+
+/*
 const server = http.createServer((req, res) => {
     let filePath = '';
 
     // Serve index.html
     if (req.url === '/' || req.url === '/index.html') {
         filePath = path.join(__dirname, 'public', 'index.html');
-        serveStaticFile(res, filePath, 'text/html');
+        try {
+            serveStaticFile(res, filePath, 'text/html');
+        } catch (error) {
+            console.log('Caught error serving static file: ', error);
+        }
+
     }
+
+
     // Serve scripts.js
     else if (req.url === '/scripts.js') {
         filePath = path.join(__dirname, 'public', 'scripts.js');
+        console.log('Req url is script.js, file path: ', filePath);
         serveStaticFile(res, filePath, 'application/javascript');
     }
     // Serve 404 for any other route
@@ -35,24 +101,10 @@ const server = http.createServer((req, res) => {
         res.end('404 - File Not Found');
     }
 });
-/*
-const server = http.createServer((req, res) => {
-    // Set the response header (status code and content type)
-    res.writeHead(200, { 'Content-Type': 'text/html' });
 
-    // Write the response body
-    res.write('<h1>Hello</h1>');
 
-    // End the response
-    res.end();
-});
-*/
-// Server listens on port 3000
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
 
+BEGIN EXCEL LOGIC BELOW:
 
 console.log('Current directory name' + '' + __dirname);
 //var directoryName = __dirname;

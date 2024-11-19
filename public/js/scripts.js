@@ -1,18 +1,15 @@
-// Require Chart.js
-const Chart = require('chart.js/auto');
+// This script is for the chart rendering logic
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Get the context of the canvas element we want to render the chart in
+// Ensure Chart.js is loaded before this code runs
+window.onload = function () {
     const ctx = document.getElementById('myChart').getContext('2d');
-
-    // Create a new chart
     const myChart = new Chart(ctx, {
-        type: 'bar',  // You can change the type to 'line', 'pie', 'doughnut', etc.
+        type: 'bar', // Chart type (bar chart)
         data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
             datasets: [{
-                label: 'Sales',
-                data: [12, 19, 3, 5, 2, 3],  // Replace this with your data
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
@@ -40,4 +37,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-});
+};

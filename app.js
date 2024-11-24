@@ -9,6 +9,9 @@ const chart = require('./public/js/chart');
 
 // Create server to handle requests
 const server = http.createServer((req, res) => {
+    const filePath = path.join(__dirname, 'public', req.url);
+    const ext = path.extname(filePath).toLowerCase();
+
     if (req.url === '/api/chart-data' && req.method === 'GET') {
         // Serve the JSON data
         const data = getChartData();
@@ -32,6 +35,9 @@ const server = http.createServer((req, res) => {
                 res.end(content);
             }
         });
+    } else if (ext === '.css') {
+        res.writeHead(200, { 'Content-Type': 'text/css' });
+        fs.createReadStream(filePath).pipe(res);
     } else {
         res.writeHead(404);
         res.end('Not Found');

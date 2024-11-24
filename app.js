@@ -31,32 +31,35 @@ function serveStaticFile(res, filePath, contentType, responseCode = 200) {
 }
 
 // Create the server
+// Create server to handle requests
 const server = http.createServer((req, res) => {
-    // Handle API or dynamic routes
-    if (handleRoutes(req, res)) return;
-
-    // Serve static files
-    const filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
-    const extname = path.extname(filePath);
-    let contentType = 'text/html';
-    switch (extname) {
-        case '.js': contentType = 'text/javascript'; break;
-        case '.css': contentType = 'text/css'; break;
-        case '.json': contentType = 'application/json'; break;
-        case '.png': contentType = 'image/png'; break;
-        case '.jpg': contentType = 'image/jpeg'; break;
-        case '.ico': contentType = 'image/x-icon'; break;
+    if (req.url === '/api/chart-data' && req.method === 'GET') {
+        // Serve the JSON data
+        const data = getChartData();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(data));
+    } else if (req.url === '/' && req.method === 'GET') {
+        // Serve your index.html file
+        fs.readFile(path.join(__dirname, 'public', 'index.html'), (err, content) => {
+            if (err) throw err;
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(content);
+        });
+    } else if (req.url.startsWith('/js') && req.method === 'GET') {
+        // Serve JavaScript files
+        fs.readFile(path.join(__dirname, 'public', req.url), (err, content) => {
+            if (err) {
+                res.writeHead(404);
+                res.end('File not found');
+            } else {
+                res.writeHead(200, { 'Content-Type': 'application/javascript' });
+                res.end(content);
+            }
+        });
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
     }
-
-    fs.stat(filePath, (err, stats) => {
-        console.log('Requested filepath', filePath);
-        if (!err && stats.isFile()) {
-            serveStaticFile(res, filePath, contentType);
-        } else {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('404: File Not Found');
-        }
-    });
 });
 
 // Server listens on port 3000
@@ -64,9 +67,6 @@ const PORT = 3000;
 server.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-
-getChartData();
 
 function getChartData() {
     console.log('Current directory name' + '' + __dirname);
@@ -124,8 +124,6 @@ function getChartData() {
 }
 
 
-
-
 function convertExcelDate(excelSerialDate) {
     // Excel starts from January 1, 1900, which corresponds to serial date 1.
     // In JavaScript, dates start from 1970-01-01 (Unix epoch), so we adjust accordingly.
@@ -137,5 +135,3 @@ function convertExcelDate(excelSerialDate) {
     const formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     return formattedDate;
 }
-
-

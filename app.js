@@ -5,32 +5,8 @@ const path = require('path');
 const http = require('http');
 const { log } = require('console');
 const { LogarithmicScale } = require('chart.js');
+const chart = require('./public/js/chart');
 
-
-// Handle routes and API logic
-function handleRoutes(req, res) {
-    if (req.url === '/api/data') {
-        // Example API response
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ message: 'Hello from the server!' }));
-        return true;
-    }
-    return false;
-}
-
-function serveStaticFile(res, filePath, contentType, responseCode = 200) {
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('500 - Internal Server Error');
-        } else {
-            res.writeHead(responseCode, { 'Content-Type': contentType });
-            res.end(data);
-        }
-    });
-}
-
-// Create the server
 // Create server to handle requests
 const server = http.createServer((req, res) => {
     if (req.url === '/api/chart-data' && req.method === 'GET') {
@@ -77,49 +53,48 @@ function getChartData() {
 
 
     const workbook = xlsx.readFile(filename);
-    //console.log('Workbook object: \n', workbook);
-    //const workSheetsFromFile = xlsx.parse(`${directoryName}/myFile.xlsx`);
-    //console.log('Worksheet from file', workSheetsFromFile);
     const sheetNameList = workbook.SheetNames;
-    //console.log('Sheet name list: ' + '\n', sheetNameList);
 
     const arrSheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetNameList[0]]);
     console.log(arrSheetData);
     let firstRow = arrSheetData[0];
 
     console.log('First row data \n', firstRow);
-    let foodTotal = 0;
-    let gasTotal = 0;
-    let billTotal = 0;
 
-
-
+    let chartData = [];
     for (let i = 0; i < arrSheetData.length; i++) {
 
         let expense = arrSheetData[i].Expense;
         let amount = arrSheetData[i].Amount;
-        //console.log(`Date as integer on line ${i}: ${intDate}`);
-        if (expense === 'Food') {
-            foodTotal += amount;
-        } else if (expense === 'Gas') {
-            gasTotal += amount;
-        } else if (expense.includes('Bill')) {
-            billTotal += amount;
+        let category = arrSheetData[i].Category;
+
+        console.log('Chart data length: ', chartData.length);
+        if (!chartData.length) {
+            chartData.push({
+                label: category,
+                total: amount
+            });
+            continue;
+        }
+        for (let j = 0; j < chartData.length; j++) {
+            if (chartData[j].label === category) {
+                console.log(`Category ${category} matches chart data label ${chartData[j].label}`);
+                chartData[j].total += amount;
+                continue;
+            } else if (j === chartData.length - 1) {
+                chartData.push({
+                    label: category,
+                    total: amount
+                });
+                break;
+            }
         }
 
         let intDate = arrSheetData[i].Date;
         let date = convertExcelDate(intDate);
         //console.log(`Date converted on line ${i}: ${date}`);
     }
-
-    let chartData = {
-        foodTotal,
-        gasTotal,
-        billTotal
-    };
-
     console.log('Chart data: ', chartData);
-
     return chartData;
 }
 

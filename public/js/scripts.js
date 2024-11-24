@@ -6,8 +6,9 @@ window.onload = function () {
         .then((data) => {
             // Process the data for the chart
             console.log('Chart data: ', data);
-            const labels = ['Food Total', 'Gas Total', 'Bill total']
-            const values = Object.values(data);
+            //const labels = ['Food Total', 'Gas Total', 'Bill total'];
+            const labels = data.map((category) => category.label);
+            const values = data.map((category) => category.total);
             console.log('Values: ', values);
             // Create the chart
             const ctx = document.getElementById('myChart').getContext('2d');

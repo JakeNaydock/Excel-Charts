@@ -1,13 +1,21 @@
 body {
-    background-color: lightblue;
+    background-color: rgb(255, 255, 255);
 }
 
 h1 {
     color: white;
     text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 
 p {
     font-family: verdana;
     font-size: 20px;
+    color: rgba(216, 230, 26, 0.616)
+}
+
+label {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 20px;
+    color: rgba(0, 38, 255, 0.884)
 }

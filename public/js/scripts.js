@@ -19,8 +19,8 @@ window.onload = function () {
                     datasets: [{
                         label: 'Excel Data',
                         data: values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: barColors,
+                        borderColor: borderColors,
                         borderWidth: 1,
                     }],
                 },
@@ -30,8 +30,21 @@ window.onload = function () {
                             beginAtZero: true,
                         },
                     },
+                    responsive: false
                 },
             });
         })
         .catch((error) => console.error('Error fetching chart data:', error));
 };
+
+const barColors = [
+    'rgba(241, 106, 106, 0.822)',//light red
+    'rgba(49, 214, 214, 0.507)', //light blue
+    'rgba(161, 168, 62, 0.863)' //yellow
+];
+
+const borderColors = [
+    'rgba(255, 1, 1, 0.822)', //red
+    'rgba(9, 243, 243, 0.116)', //blue
+    'rgba(216, 230, 26, 0.616)' //yellow
+];

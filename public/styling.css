@@ -19,3 +19,18 @@ label {
     font-size: 20px;
     color: rgba(0, 38, 255, 0.884)
 }
+
+#startdatediv {
+    display: inline-block;
+    font-size: xx-large;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 200px;
+    text-align: center;
+
+}
+
+#enddatediv {
+    display: inline-block;
+    width: 200px;
+    text-align: left;
+}
